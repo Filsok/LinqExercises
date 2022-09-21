@@ -10,6 +10,20 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using LinqExercises;
 
+/*
+Getting Data:
+.Where(predicate)
+.Single(predicate)      .SingleOrDefault(predicate)
+.First(predicate)       .FirstOrDefault(predicate)
+.Last(predicate)        .LastOrDefault(predicate)
+.OrderBy(keySelector)   .OrderByDescending(keySelector)
+
+Data projection:
+.Select(selector)
+
+
+ */
+
 class Program
 {
     static void Main(string[] args)
@@ -18,7 +32,23 @@ class Program
         var googleApps = LoadGoogleApps(csvPath);
 
         //Display(googleApps);
-        GetData(googleApps);
+        ProjecitionData(googleApps);
+    }
+
+    static void ProjecitionData(IEnumerable<GoogleApp> googleApps)
+    {
+        var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.6 && app.Category == Category.BEAUTY);
+
+        var highRatedBeautyAppsNames =highRatedBeautyApps.Select(app=>app.Name);
+
+        var dtos = highRatedBeautyApps.Select(app=>new GoogleAppDto() 
+            { Reviews=app.Reviews, Name=app.Name});
+
+        foreach (var dto in dtos)
+            Console.WriteLine($"{dto.Name}: {dto.Reviews}");
+
+
+        var genres = highRatedBeautyApps.Select(app => app.Genres);
     }
 
     static void GetData(IEnumerable<GoogleApp> googleApps)
@@ -26,7 +56,14 @@ class Program
         var highRatedApps = googleApps.Where(app => app.Rating > (decimal)4.6);
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.6 && app.Category == Category.BEAUTY);
         Display(highRatedBeautyApps);
-    }
+        
+        //var FirstHighRatedBeautyApp = highRatedBeautyApps.OrderByDescending(a=> a.Rating).First();
+        //var FirstHighRatedBeautyApp = highRatedBeautyApps.First(a=>a.Reviews < 300);
+        //var FirstHighRatedBeautyApp = highRatedBeautyApps.SingleOrDefault(a=>a.Reviews < 50);
+        var FirstHighRatedBeautyApp = highRatedBeautyApps.LastOrDefault(a=>a.Reviews < 300);
+        Console.WriteLine($"High rated beauty app is: ");
+        Console.WriteLine(FirstHighRatedBeautyApp);
+    }   
 
     static void Display(IEnumerable<GoogleApp> googleApps)
     {
