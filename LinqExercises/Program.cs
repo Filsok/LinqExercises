@@ -28,9 +28,15 @@ Data sort:
 .OrderBy(keySelector)   .OrderByDescending(keySelector)
 .ThenBy(keySelector)    .ThenByDescending(keySelector)
 
+Data set operations:
+.Distinct()             .DistinctBy()
+.Union(set)             .UnionBy(set)
+.Intersect(set)         .IntersectBy(set)
+.Except(set)            .ExceptBy(set)
 
-
-
+Data verification:
+.All(predicate)
+.Any(predicate)
 
 
  */
@@ -46,14 +52,54 @@ class Program
         //GetData(googleApps);
         //ProjecitionData(googleApps);
         //DivideData(googleApps);
-        OrderData(googleApps);
+        //OrderData(googleApps);
+        //DataSetOperation(googleApps);
+        DataVerification(googleApps);
+    }
+
+    static void DataVerification(List<GoogleApp> googleApps)
+    {
+        var allOperatorResult = googleApps.Where(a => a.Category == Category.WEATHER)
+            .All(a => a.Reviews > 10);
+        Console.WriteLine($"Result allOperatorResult: {allOperatorResult}");
+
+        var anyOperatorResult = googleApps.Where(a => a.Category == Category.WEATHER)
+            .Any(a => a.Reviews > 2_000_000);
+        Console.WriteLine($"Result anyOperatorResult: {anyOperatorResult}");
+    }
+
+    static void DataSetOperation(List<GoogleApp> googleApps)
+    {
+        //var paidAppsCategories = googleApps.Where(a => a.Type == LinqExercises.Type.Paid)
+        //    .Select(a=>a.Category).Distinct();
+        //Console.WriteLine($"Paid apps categories: {string.Join(", ", paidAppsCategories)}");
+
+        var setA = googleApps.Where(a => a.Rating > (decimal)4.7 && a.Type == LinqExercises.Type.Paid && a.Reviews > 1000)
+            .DistinctBy(a => a.Name);
+        var setB = googleApps.Where(a => a.Name.Contains("Pro") && a.Rating > (decimal)4.6 && a.Reviews > 10000)
+            .DistinctBy(a => a.Name);
+
+        Console.WriteLine("\nApps Union:");
+        var appsUnion = setA.Union(setB);
+        Display(appsUnion);
+
+        Console.WriteLine("\nApps Intersect:");
+        var appsIntersect = setA.Intersect(setB);
+        Display(appsIntersect);
+
+        Console.WriteLine("\nApps Except:");
+        var appsExcept = setA.Except(setB);
+        Display(appsExcept);
     }
 
     static void OrderData(List<GoogleApp> googleApps)
     {
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.4 && app.Category == Category.BEAUTY);
 
-        var sortedResults = highRatedBeautyApps.OrderByDescending(app => app.Rating).ThenBy(app=>app.Name);
+        var sortedResults = highRatedBeautyApps
+            .OrderByDescending(app => app.Rating)
+            .ThenByDescending(app=>app.Reviews)
+            .Take(8);
         Display(sortedResults);
     }
 
