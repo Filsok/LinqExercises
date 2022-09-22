@@ -9,6 +9,7 @@ using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 using LinqExercises;
+using System.Threading.Tasks.Dataflow;
 
 /*
 Getting Data:
@@ -38,6 +39,10 @@ Data verification:
 .All(predicate)
 .Any(predicate)
 
+Data segregation:
+
+
+
 
  */
 
@@ -54,7 +59,29 @@ class Program
         //DivideData(googleApps);
         //OrderData(googleApps);
         //DataSetOperation(googleApps);
-        DataVerification(googleApps);
+        //DataVerification(googleApps);
+        GroupData(googleApps);
+    }
+
+    private static void GroupData(List<GoogleApp> googleApps)
+    {
+        //var categoryGroup = googleApps.GroupBy(a => a.Category);
+        var categoryGroup = googleApps.GroupBy(a => new { a.Category, a.Type});
+
+        //var artAndDesignGroup = categoryGroup.First(g => g.Key == Category.ART_AND_DESIGN);
+        ////var appsArtAndDesignGroup = artAndDesignGroup.Select(e => e);          //first method
+        //var appsArtAndDesignGroup = artAndDesignGroup.ToList();                  //second method
+        //Console.WriteLine($"Displaying elements for group {artAndDesignGroup.Key}");
+        //Display(appsArtAndDesignGroup);
+
+        foreach (var group in categoryGroup)
+        {
+            var apps = group.ToList();
+            //Console.WriteLine($"\n\nDisplaying elements for group _______{group.Key}_______");
+            Console.WriteLine($"\n\nDisplaying elements for group _______{group.Key.Category} , {group.Key.Type}_______");
+            Display(apps);
+        }
+
     }
 
     static void DataVerification(List<GoogleApp> googleApps)
