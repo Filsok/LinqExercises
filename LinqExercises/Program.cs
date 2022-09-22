@@ -16,10 +16,20 @@ Getting Data:
 .Single(predicate)      .SingleOrDefault(predicate)
 .First(predicate)       .FirstOrDefault(predicate)
 .Last(predicate)        .LastOrDefault(predicate)
-.OrderBy(keySelector)   .OrderByDescending(keySelector)
 
 Data projection:
 .Select(selector)       .SelectMany(selector)  //flatting
+
+Data divide:
+.Take()                 .TakeLast()                     .TakeWhile(predicate)
+.Skip()                 .SkipLast()                     .SkipWhile(predicate)
+
+Data sort:
+.OrderBy(keySelector)   .OrderByDescending(keySelector)
+.ThenBy(keySelector)    .ThenByDescending(keySelector)
+
+
+
 
 
 
@@ -33,7 +43,32 @@ class Program
         var googleApps = LoadGoogleApps(csvPath);
 
         //Display(googleApps);
-        ProjecitionData(googleApps);
+        //GetData(googleApps);
+        //ProjecitionData(googleApps);
+        //DivideData(googleApps);
+        OrderData(googleApps);
+    }
+
+    static void OrderData(List<GoogleApp> googleApps)
+    {
+        var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.4 && app.Category == Category.BEAUTY);
+
+        var sortedResults = highRatedBeautyApps.OrderByDescending(app => app.Rating).ThenBy(app=>app.Name);
+        Display(sortedResults);
+    }
+
+    static void DivideData(IEnumerable<GoogleApp> googleApps)
+    {
+        var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.4 && app.Category == Category.BEAUTY);
+        //var first5HighRatedBeautyApps = highRatedBeautyApps.Take(5);
+        //var first5HighRatedBeautyApps = highRatedBeautyApps.TakeLast(5);
+        //var first5HighRatedBeautyApps = highRatedBeautyApps.TakeWhile(app=>app.Reviews>1000).Take(5);
+        //Display(first5HighRatedBeautyApps);
+
+        //var skippedResults = highRatedBeautyApps.Skip(5);
+        //var skippedResults = highRatedBeautyApps.SkipLast(5);
+        var skippedResults = highRatedBeautyApps.SkipWhile(app => app.Reviews > 1000);
+        Display(skippedResults);
     }
 
     static void ProjecitionData(IEnumerable<GoogleApp> googleApps)
@@ -76,7 +111,7 @@ class Program
         {
             Console.WriteLine(googleApp);
         }
-        Console.WriteLine($"Rows number: {googleApps.Count()}");
+        Console.WriteLine($"Rows count: {googleApps.Count()}");
     }
 
     static void Display(GoogleApp googleApp)
