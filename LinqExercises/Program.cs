@@ -19,7 +19,8 @@ Getting Data:
 .OrderBy(keySelector)   .OrderByDescending(keySelector)
 
 Data projection:
-.Select(selector)
+.Select(selector)       .SelectMany(selector)  //flatting
+
 
 
  */
@@ -43,12 +44,16 @@ class Program
 
         var dtos = highRatedBeautyApps.Select(app=>new GoogleAppDto() 
             { Reviews=app.Reviews, Name=app.Name});
+        
+        var annonymousDtos = highRatedBeautyApps.Select(app=>new 
+            { Reviews=app.Reviews, Name=app.Name});
 
-        foreach (var dto in dtos)
+        foreach (var dto in annonymousDtos)
             Console.WriteLine($"{dto.Name}: {dto.Reviews}");
 
 
-        var genres = highRatedBeautyApps.Select(app => app.Genres);
+        //var genres = highRatedBeautyApps.SelectMany(app => app.Genres);
+        //Console.WriteLine(String.Join(", ", genres));
     }
 
     static void GetData(IEnumerable<GoogleApp> googleApps)
