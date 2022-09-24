@@ -43,7 +43,10 @@ Data segregation:
 .GroupBy(keySelector)
 
 Operation on groups:
-.
+.Average(selector)
+.Min(selector)          .Max(selector)
+.Sum(selector)
+
 
 
  */
