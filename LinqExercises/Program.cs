@@ -40,8 +40,10 @@ Data verification:
 .Any(predicate)
 
 Data segregation:
+.GroupBy(keySelector)
 
-
+Operation on groups:
+.
 
 
  */
@@ -60,13 +62,41 @@ class Program
         //OrderData(googleApps);
         //DataSetOperation(googleApps);
         //DataVerification(googleApps);
-        GroupData(googleApps);
+        //GroupData(googleApps);
+        GroupDataOperations(googleApps);
+    }
+
+    private static void GroupDataOperations(List<GoogleApp> googleApps)
+    {
+        var categoryGroup = googleApps
+            .GroupBy(a => a.Category)
+            //.Where(g => g.Min(a => a.Reviews >= 10))
+            ;
+
+        foreach (var group in categoryGroup)
+        {
+            var averageReviews = Math.Round(group.Average(a => a.Reviews));
+            var minReviews = group.Min(a => a.Reviews);
+            var maxReviews = group.Max(a => a.Reviews);
+
+            var reviewsCount = group.Sum(a => a.Reviews);
+
+            var allAppsFromGroupHaveRatingOfTree = group.All(a => a.Rating > (decimal)3.0);
+
+            Console.WriteLine($"Category: {group.Key}");
+            Console.WriteLine($"avarageReviews: {averageReviews}");
+            Console.WriteLine($"minReviews: {minReviews}");
+            Console.WriteLine($"maxReviews: {maxReviews}");
+            Console.WriteLine($"reviewsCount: {reviewsCount}");
+            Console.WriteLine($"allAppsFromGroupHaveRatingOfTree: {allAppsFromGroupHaveRatingOfTree}");
+            Console.WriteLine("\n");
+        }
     }
 
     private static void GroupData(List<GoogleApp> googleApps)
     {
         //var categoryGroup = googleApps.GroupBy(a => a.Category);
-        var categoryGroup = googleApps.GroupBy(a => new { a.Category, a.Type});
+        var categoryGroup = googleApps.GroupBy(a => new { a.Category, a.Type });
 
         //var artAndDesignGroup = categoryGroup.First(g => g.Key == Category.ART_AND_DESIGN);
         ////var appsArtAndDesignGroup = artAndDesignGroup.Select(e => e);          //first method
@@ -78,10 +108,10 @@ class Program
         {
             var apps = group.ToList();
             //Console.WriteLine($"\n\nDisplaying elements for group _______{group.Key}_______");
+            var averageReviews = group.Average(g => g.Reviews);
             Console.WriteLine($"\n\nDisplaying elements for group _______{group.Key.Category} , {group.Key.Type}_______");
             Display(apps);
         }
-
     }
 
     static void DataVerification(List<GoogleApp> googleApps)
@@ -125,7 +155,7 @@ class Program
 
         var sortedResults = highRatedBeautyApps
             .OrderByDescending(app => app.Rating)
-            .ThenByDescending(app=>app.Reviews)
+            .ThenByDescending(app => app.Reviews)
             .Take(8);
         Display(sortedResults);
     }
@@ -148,13 +178,13 @@ class Program
     {
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.6 && app.Category == Category.BEAUTY);
 
-        var highRatedBeautyAppsNames =highRatedBeautyApps.Select(app=>app.Name);
+        var highRatedBeautyAppsNames = highRatedBeautyApps.Select(app => app.Name);
 
-        var dtos = highRatedBeautyApps.Select(app=>new GoogleAppDto() 
-            { Reviews=app.Reviews, Name=app.Name});
-        
-        var annonymousDtos = highRatedBeautyApps.Select(app=>new 
-            { Reviews=app.Reviews, Name=app.Name});
+        var dtos = highRatedBeautyApps.Select(app => new GoogleAppDto()
+        { Reviews = app.Reviews, Name = app.Name });
+
+        var annonymousDtos = highRatedBeautyApps.Select(app => new
+        { Reviews = app.Reviews, Name = app.Name });
 
         foreach (var dto in annonymousDtos)
             Console.WriteLine($"{dto.Name}: {dto.Reviews}");
@@ -169,14 +199,14 @@ class Program
         var highRatedApps = googleApps.Where(app => app.Rating > (decimal)4.6);
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.6 && app.Category == Category.BEAUTY);
         Display(highRatedBeautyApps);
-        
+
         //var FirstHighRatedBeautyApp = highRatedBeautyApps.OrderByDescending(a=> a.Rating).First();
         //var FirstHighRatedBeautyApp = highRatedBeautyApps.First(a=>a.Reviews < 300);
         //var FirstHighRatedBeautyApp = highRatedBeautyApps.SingleOrDefault(a=>a.Reviews < 50);
-        var FirstHighRatedBeautyApp = highRatedBeautyApps.LastOrDefault(a=>a.Reviews < 300);
+        var FirstHighRatedBeautyApp = highRatedBeautyApps.LastOrDefault(a => a.Reviews < 300);
         Console.WriteLine($"High rated beauty app is: ");
         Console.WriteLine(FirstHighRatedBeautyApp);
-    }   
+    }
 
     static void Display(IEnumerable<GoogleApp> googleApps)
     {
