@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LinqExercises
+﻿namespace LinqExercises
 {
     public class GoogleApp
     {
-        public string Name  { get; set; }
+        public string Name { get; set; }
         public Category Category { get; set; }
         public decimal Rating { get; set; }
         public int Reviews { get; set; }
@@ -22,17 +14,17 @@ namespace LinqExercises
         public List<string> Genres { get; set; }
         public DateTime LastUpdated { get; set; }
 
-
         public override string ToString()
         {
             return $"{(Name.Length > 25 ? Name.Substring(0, 25) + "..." : Name),-28} | " +
                 $"{Category,-20} | " +
                 $"{Rating,-3} | " +
                 $"{Reviews,-10} | " +
+                $"{Size,-18} | " +
                 $"{Type,-4} | " +
                 $"{Price,-7} | " +
                 $"{LastUpdated.ToShortDateString(),-10} | " +
-                $"{string.Join(", ", Genres)}";                ;
+                $"{string.Join(", ", Genres)}"; ;
         }
     }
 }

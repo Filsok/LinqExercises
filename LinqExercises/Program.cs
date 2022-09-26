@@ -1,15 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Globalization;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Globalization;
 using CsvHelper;
-using CsvHelper.Configuration;
 using LinqExercises;
-using System.Threading.Tasks.Dataflow;
 
 /*
 Getting Data:
@@ -47,13 +38,15 @@ Operation on groups:
 .Min(selector)          .Max(selector)
 .Sum(selector)
 
-
+Data integration:
+.Join(secondDataGroup, innerSelector, outerSelector, result)
+.GroupJoin(secondDataGroup, innerSelector, outerSelector, result)
 
  */
 
-class Program
+public static class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         var csvPath = @"D:\git\LinqExercises\LinqExercises\LinqExercises\googleplaystore1.csv";
         var googleApps = LoadGoogleApps(csvPath);
@@ -66,7 +59,9 @@ class Program
         //DataSetOperation(googleApps);
         //DataVerification(googleApps);
         //GroupData(googleApps);
-        GroupDataOperations(googleApps);
+        //GroupDataOperations(googleApps);
+
+        AdditionalExercises.LikeMain(googleApps);
     }
 
     private static void GroupDataOperations(List<GoogleApp> googleApps)
@@ -105,7 +100,7 @@ class Program
         ////var appsArtAndDesignGroup = artAndDesignGroup.Select(e => e);          //first method
         //var appsArtAndDesignGroup = artAndDesignGroup.ToList();                  //second method
         //Console.WriteLine($"Displaying elements for group {artAndDesignGroup.Key}");
-        //Display(appsArtAndDesignGroup);
+        //DisplayClass.Display(appsArtAndDesignGroup);
 
         foreach (var group in categoryGroup)
         {
@@ -113,11 +108,11 @@ class Program
             //Console.WriteLine($"\n\nDisplaying elements for group _______{group.Key}_______");
             var averageReviews = group.Average(g => g.Reviews);
             Console.WriteLine($"\n\nDisplaying elements for group _______{group.Key.Category} , {group.Key.Type}_______");
-            Display(apps);
+            DisplayClass.Display(apps);
         }
     }
 
-    static void DataVerification(List<GoogleApp> googleApps)
+    private static void DataVerification(List<GoogleApp> googleApps)
     {
         var allOperatorResult = googleApps.Where(a => a.Category == Category.WEATHER)
             .All(a => a.Reviews > 10);
@@ -128,7 +123,7 @@ class Program
         Console.WriteLine($"Result anyOperatorResult: {anyOperatorResult}");
     }
 
-    static void DataSetOperation(List<GoogleApp> googleApps)
+    private static void DataSetOperation(List<GoogleApp> googleApps)
     {
         //var paidAppsCategories = googleApps.Where(a => a.Type == LinqExercises.Type.Paid)
         //    .Select(a=>a.Category).Distinct();
@@ -141,18 +136,18 @@ class Program
 
         Console.WriteLine("\nApps Union:");
         var appsUnion = setA.Union(setB);
-        Display(appsUnion);
+        DisplayClass.Display(appsUnion);
 
         Console.WriteLine("\nApps Intersect:");
         var appsIntersect = setA.Intersect(setB);
-        Display(appsIntersect);
+        DisplayClass.Display(appsIntersect);
 
         Console.WriteLine("\nApps Except:");
         var appsExcept = setA.Except(setB);
-        Display(appsExcept);
+        DisplayClass.Display(appsExcept);
     }
 
-    static void OrderData(List<GoogleApp> googleApps)
+    private static void OrderData(List<GoogleApp> googleApps)
     {
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.4 && app.Category == Category.BEAUTY);
 
@@ -160,10 +155,10 @@ class Program
             .OrderByDescending(app => app.Rating)
             .ThenByDescending(app => app.Reviews)
             .Take(8);
-        Display(sortedResults);
+        DisplayClass.Display(sortedResults);
     }
 
-    static void DivideData(IEnumerable<GoogleApp> googleApps)
+    private static void DivideData(IEnumerable<GoogleApp> googleApps)
     {
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.4 && app.Category == Category.BEAUTY);
         //var first5HighRatedBeautyApps = highRatedBeautyApps.Take(5);
@@ -174,10 +169,10 @@ class Program
         //var skippedResults = highRatedBeautyApps.Skip(5);
         //var skippedResults = highRatedBeautyApps.SkipLast(5);
         var skippedResults = highRatedBeautyApps.SkipWhile(app => app.Reviews > 1000);
-        Display(skippedResults);
+        DisplayClass.Display(skippedResults);
     }
 
-    static void ProjecitionData(IEnumerable<GoogleApp> googleApps)
+    private static void ProjecitionData(IEnumerable<GoogleApp> googleApps)
     {
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.6 && app.Category == Category.BEAUTY);
 
@@ -192,16 +187,15 @@ class Program
         foreach (var dto in annonymousDtos)
             Console.WriteLine($"{dto.Name}: {dto.Reviews}");
 
-
         //var genres = highRatedBeautyApps.SelectMany(app => app.Genres);
         //Console.WriteLine(String.Join(", ", genres));
     }
 
-    static void GetData(IEnumerable<GoogleApp> googleApps)
+    private static void GetData(IEnumerable<GoogleApp> googleApps)
     {
         var highRatedApps = googleApps.Where(app => app.Rating > (decimal)4.6);
         var highRatedBeautyApps = googleApps.Where(app => app.Rating > (decimal)4.6 && app.Category == Category.BEAUTY);
-        Display(highRatedBeautyApps);
+        DisplayClass.Display(highRatedBeautyApps);
 
         //var FirstHighRatedBeautyApp = highRatedBeautyApps.OrderByDescending(a=> a.Rating).First();
         //var FirstHighRatedBeautyApp = highRatedBeautyApps.First(a=>a.Reviews < 300);
@@ -211,21 +205,7 @@ class Program
         Console.WriteLine(FirstHighRatedBeautyApp);
     }
 
-    static void Display(IEnumerable<GoogleApp> googleApps)
-    {
-        foreach (var googleApp in googleApps)
-        {
-            Console.WriteLine(googleApp);
-        }
-        Console.WriteLine($"Rows count: {googleApps.Count()}");
-    }
-
-    static void Display(GoogleApp googleApp)
-    {
-        Console.WriteLine(googleApp);
-    }
-
-    static List<GoogleApp> LoadGoogleApps(string csvPath)
+    private static List<GoogleApp> LoadGoogleApps(string csvPath)
     {
         using (var reader = new StreamReader(csvPath))
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
